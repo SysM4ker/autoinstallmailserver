@@ -1,19 +1,7 @@
 
 ```
-apt install cron perl nginx fail2ban snapd net-tools
-```
-
-Add users 
-```
-adduser $username
-usermod -aG sudo $username
+apt install cron nginx snapd net-tools
 mkdir /home/$mail
-```
-To prevent connection via Root
-```
-vim /etc/ssh/sshd_config
-	PermitRootLogin no
-systemctl restart ssh.service
 ```
 
 Install docker
@@ -38,7 +26,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 Install poste.io with docker
 ```
-docker run --net=host -e TZ=Europe/Paris -v /your-data-dir/data:/data --name "mailserver" -h "mail.example.com" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -t analogic/poste.io
+docker run --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserver" -h "mail.example.com" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -t analogic/poste.io
 ```
 - **-e "DISABLE_CLAMAV=TRUE"** To disable ClamAV, it is useful for low mem usage.
     
@@ -51,7 +39,9 @@ docker rm $nameservice
 ```
 Use certbot for https
 ```
-
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx
 ```
 
 
