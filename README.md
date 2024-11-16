@@ -195,7 +195,6 @@ C'est souvent la meilleure option. Voici comment procéder :
 https://docs.pulseheberg.com/en/article/i-cant-send-emails-from-my-server-1lir99q/
 
 
-no-reply@ozzzint.fr
 
 
 # Source :
