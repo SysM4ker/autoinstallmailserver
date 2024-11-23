@@ -39,3 +39,9 @@ ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/
 sudo nginx -s reload
 
 ###########
+
+#install certbot for https
+#https://certbot.eff.org/instructions?ws=nginx&os=snap
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx
