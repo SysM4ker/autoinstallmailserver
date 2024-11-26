@@ -21,12 +21,12 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 # To install the latest version, run:
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
 mkdir /home/mail
 
 #Install poste.io with docker
-docker run --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserver" -h "mail.example.com" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -e "DISABLE_CLAMAV=TRUE" -t analogic/poste.io
+docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserver" -h "mail.example.com" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -e "DISABLE_CLAMAV=TRUE" -t analogic/poste.io
 
 #-e "DISABLE_CLAMAV=TRUE" To disable ClamAV, it is useful for low mem usage.
 #-e "DISABLE_RSPAMD=TRUE" To disable Rspamd, it is useful for low mem usage.
