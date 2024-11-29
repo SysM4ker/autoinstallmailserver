@@ -34,8 +34,8 @@ docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserv
 
 ##Configuration nginx
 
-wget -P /etc/nginx/site-available/ -O mail https://raw.githubusercontent.com/SysM4ker/autoinstallmailserver/refs/heads/main/confpostenginx
-ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/
+sudo wget -O /etc/nginx/sites-available/mail https://raw.githubusercontent.com/SysM4ker/autoinstallmailserver/refs/heads/main/confpostenginx
+sudo ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/
 sudo nginx -s reload
 
 ###########
