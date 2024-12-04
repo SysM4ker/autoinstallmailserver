@@ -48,10 +48,10 @@ echo "
 "
 
 #Complete machine update
-apt -y update && apt -y upgrade
+sudo apt -y update && sudo apt -y upgrade
 
 #install all the important things for a mail server
-apt install cron nginx snapd net-tools -y
+sudo apt install cron nginx snapd net-tools -y
 
 #https://docs.docker.com/engine/install/debian/#install-using-the-repository
 # Add Docker's official GPG key:
