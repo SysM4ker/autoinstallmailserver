@@ -73,8 +73,9 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 mkdir /home/mail
 
 #
-echo "Your domain name example mail.domainname.tld"
-read domain
+# echo "Your domain name example mail.domainname.tld"
+# read domain
+read -p "Enter your domain (ex: mail.exemple.tld) : " domain
 
 #Install poste.io with docker
 sudo docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserver" -h "$domain" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -e "DISABLE_CLAMAV=TRUE" -t analogic/poste.io
@@ -86,6 +87,7 @@ sudo docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mai
 ##Configuration nginx
 
 sudo wget -O /etc/nginx/sites-available/mail https://raw.githubusercontent.com/SysM4ker/autoinstallmailserver/refs/heads/main/confpostenginx
+sudo sed -i "s/mail\.domaine\.tld/$domain/g" /etc/nginx/sites-available/mail
 sudo ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/
 sudo nginx -s reload
 
