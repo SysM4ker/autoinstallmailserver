@@ -72,8 +72,12 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 mkdir /home/mail
 
+#
+echo "Your domain name example mail.domainname.tld"
+read domain
+
 #Install poste.io with docker
-docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserver" -h "mail.example.com" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -e "DISABLE_CLAMAV=TRUE" -t analogic/poste.io
+docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserver" -h "$domain" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -e "DISABLE_CLAMAV=TRUE" -t analogic/poste.io
 
 #-e "DISABLE_CLAMAV=TRUE" To disable ClamAV, it is useful for low mem usage.
 #-e "DISABLE_RSPAMD=TRUE" To disable Rspamd, it is useful for low mem usage.
