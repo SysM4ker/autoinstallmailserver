@@ -1,11 +1,48 @@
+# Automatic installation of Poste.io
+
+This project allows you to easily install a mail server using [poste.io](https://poste.io) (which runs on a docker). This README provides instructions for manual installation as well as instructions for using the automatic installation script.
+
+## Table of contents
+  - [Requirements](#requirements)
+  - [Automatic Installation](#automatic-installation)
+  - [Manuel Installation](#manuel-installation)
+  - [Configuration](#configuration)
+  - [Error Management](#error-management)
+  - [Sources](#sources)
+  - [Contributions](#contributions)
+	
+
+---
+ 
+## Requirements
+
+  - A VPS (Virtual Private Server) Or Server
+  - Root Permissions
+  - That's all it takes
+
+---
+
+## Automatic Installation
+
+To install it automatically, it's quite simple. You just need to install the script with the following command, give it execution rights and then run it. 
 
 ```
-apt install cron nginx snapd net-tools
-mkdir /home/$mail
+wget https://raw.githubusercontent.com/SysM4ker/autoinstallmailserver/refs/heads/main/install.sh
+sudo chmod +x install.sh
+./install.sh
 ```
+Once done, simply follow the instructions given in the terminal.
 
-Install docker
+---
+
+## Manuel Installation
+
+To start with, we're going to update the packages and install all the packages we'll need for the mail server.
+
 ```
+sudo apt update && sudo apt upgrade
+sudo apt install cron nginx snapd net-tools ca-certificates curl
+
 # Add Docker's official GPG key:
 sudo apt-get update
 sudo apt-get install ca-certificates curl
@@ -19,71 +56,63 @@ echo \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
-
-# Install docker
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-```
-
-Install poste.io with docker
-```
-docker run --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserver" -h "mail.example.com" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -t analogic/poste.io
-```
-- **-e "DISABLE_CLAMAV=TRUE"** To disable ClamAV, it is useful for low mem usage.
-    
-- **-e "DISABLE_RSPAMD=TRUE"** To disable Rspamd, it is useful for low mem usage.
-
+ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 ```
-docker ps -a
-docker rm $nameservice
+Once all this is done and no errors are displayed, simply install poste.io with docker
+But first we're going to create the file in which the mail service will be stored.
+
+`mkdir /home/mail`
+
 ```
-Use certbot for https
+docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserver" -h "mail.example.com" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -t analogic/poste.io
+```
+Of course, you must replace the TimeZone with the server's TimeZone and the domain name with your domain name.
+You are also free to make this service work on other ports and to name the docker as you wish.
+
+You can ensure that the service is running perfectly with the following command:
+```
+sudo docker ps
+```
+If it doesn't display the docker, it hasn't been launched.
+```
+sudo docker ps -a #Allows you to see all dockers, even those who are not launched
+```
+To close or open a docker
+```
+sudo docker stop $NAME_DOCKER
+sudo docker start $NAME_DOCKER
+```
+Once this is working perfectly, we just need to configure nginx 
+
+To configure nginx, simply install the configuration I've already prepared [here](https://raw.githubusercontent.com/SysM4ker/autoinstallmailserver/refs/heads/main/confpostenginx) with the following command:
+```
+sudo wget -O /etc/nginx/sites-available/mail https://raw.githubusercontent.com/SysM4ker/autoinstallmailserver/refs/heads/main/confpostenginx
+sudo ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/
+sudo nginx -s reload
+```
+Don't forget to change the example domain name to your own in the nginx configuration with the command : 
+`sudo nano /etc/nginx/sites-available/mail`
+
+Normally once all this is done and the [DNS configured](#configuration) you can access your mail service with the domain name. The problem is that there is no HTTPS and to configure it nothing could be simpler:
 ```
 sudo snap install --classic certbot
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 sudo certbot --nginx
 ```
+To do this, we used [certbot](https://certbot.eff.org/), so all that's left to do is follow the steps.
 
-
-Conf nginx 
+However, when you restart the server, you have to restart the docker, and since we're lazy, we want this to be done automatically, and thanks to the crontab, we can do it. 
 ```
-vim /etc/nginx/site-available/mail
-server {
-    listen 80;
-    listen [::]:80;
-    server_name mail.domaine.tld;
-
-    proxy_buffering off;
-    proxy_http_version 1.1;
-    proxy_cache_bypass $http_upgrade;
-
-    proxy_set_header Host               $host;
-    proxy_set_header Connection         "upgrade";
-    proxy_set_header Upgrade            $http_upgrade;
-    proxy_set_header X-Real-IP          $remote_addr;
-    proxy_set_header X-Forwarded-Server $host;
-    proxy_set_header X-Forwarded-Proto  $scheme;
-    proxy_set_header X-Forwarded-Port   $server_port;
-    proxy_set_header X-Forwarded-Host   $host:$server_port;
-    proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
-
-    location / {
-        proxy_pass https://0.0.0.0:4433/;
-    }
-}
-
+crontab -e #Select the editor of your choice
+#And add this line to the last line
+	@reboot sudo docker start $NAME_DOCKER
 ```
+After all that, everything should work perfectly if you have forgotten to configure [DNS redirections](#configuration). 
+If you don't receive or can't send e-mail, go [here](#error-management)
 
-`ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/`
-`nginx -s reload`
+---
 
-
-
-To make the docker launch itself on startup
-```
-crontab -e
-	@reboot docker start $dockernameservice
-```
 
 
 ## For firewall configuration, here are all the  ports used :
@@ -187,10 +216,10 @@ https://docs.pulseheberg.com/en/article/i-cant-send-emails-from-my-server-1lir99
 
 
 
-# Source :
-  - [Installation d'un SERVEUR MAIL COMPLET sous Debian avec Docker](https://www.youtube.com/watch?v=pcSV1-FX56Q) - [Github README.md](https://github.com/TheodoricSoff/Serveur-mail/blob/main/README.md)
+# Sources : 
+  - [Poste.io Docs](https://poste.io/doc/)
   - [Docker download](https://docs.docker.com/engine/install/debian/#install-using-the-repository) 
   - [Snap download](https://snapcraft.io/docs/installing-snap-on-debian)
   - [Certbot download](https://certbot.eff.org/instructions?ws=nginx&os=snap)
-  - [Poste.io Docs](https://poste.io/doc/)
-  - [How to add Users on Debian 12](https://linuxize.com/post/how-to-add-and-delete-users-on-debian/)
+  - [Installation d'un SERVEUR MAIL COMPLET sous Debian avec Docker](https://www.youtube.com/watch?v=pcSV1-FX56Q) - [Github README.md](https://github.com/TheodoricSoff/Serveur-mail/blob/main/README.md)
+
