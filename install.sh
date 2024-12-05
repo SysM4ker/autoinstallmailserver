@@ -41,7 +41,7 @@ CONTAINER_NAME="mailserver"
 read -p "Enter your domain (ex: mail.exemple.tld) : " DOMAIN
 
 #Install poste.io with docker
-sudo docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mailserver" -h "$DOMAIN" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -e "DISABLE_CLAMAV=TRUE" -t analogic/poste.io
+sudo docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "$CONTAINER_NAME" -h "$DOMAIN" -e "HTTP_PORT=8080" -e "HTTPS_PORT=4433" -e "DISABLE_CLAMAV=TRUE" -t analogic/poste.io
 
 #-e "DISABLE_CLAMAV=TRUE" To disable ClamAV, it is useful for low mem usage.
 #-e "DISABLE_RSPAMD=TRUE" To disable Rspamd, it is useful for low mem usage.
