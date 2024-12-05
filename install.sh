@@ -47,7 +47,7 @@ sudo docker run -d --net=host -e TZ=Europe/Paris -v /home/mail:/data --name "mai
 #-e "DISABLE_RSPAMD=TRUE" To disable Rspamd, it is useful for low mem usage.
 
 #Crontabe configuration so that the docker can be launched on startup
-(crontab -l 2>/dev/null; echo "@reboot docker start $CONTAINER_NAME") | crontab -
+(crontab -l 2>/dev/null; echo "@reboot sudo docker start $CONTAINER_NAME") | crontab -
 
 ##Configuration nginx
 
