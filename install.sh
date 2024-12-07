@@ -32,10 +32,10 @@ sudo apt-get update
 # To install the latest version, run:
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
-mkdir /home/mail
+sudo mkdir /home/mail
 CONTAINER_NAME="mailserver"
+TIME_ZONE="Europe/Paris"
 
-#
 # echo "Your domain name example mail.domainname.tld"
 # read domain
 read -p "Enter your domain (ex: mail.exemple.tld) : " DOMAIN
